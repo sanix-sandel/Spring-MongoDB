@@ -7,22 +7,26 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoClientFactoryBean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import com.mongodb.Mongo;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
+@EnableMongoRepositories(basePackages = "com.sanix.SpringMongo")
+//nables detection of interfaces that
+//extend the Spring Data CrudRepository and are used for domain
+// objects annotated with @Document.
 public class MongoConfiguration {
 
+    public static final String DB_NAME="vehicledb";
+
     @Bean
-    public MongoTemplate mongo(Mongo mongo) throws Exception{
-        return new MongoTemplate(mongo);
+    public MongoTemplate mongoTemplate(Mongo mongo) throws Exception{
+        return new MongoTemplate(mongo, DB_NAME);
     }
 
     @Bean
-    public MongoClientFactoryBean mongoClientFactoryBean(){
+    public MongoClientFactoryBean mongoFactoryBean(){
         return new MongoClientFactoryBean();
     }
 
-    @Bean
-    public VehicleRepository vehicleRepository(MongoTemplate mongo){
-        return new MongoDBVehicleRepository(mongo, "vehicles");
-    }
+
 }

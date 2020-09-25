@@ -28,8 +28,8 @@ public class MongoDBVehicleRepository implements VehicleRepository {
     }
 
     @Override
-    public void save(Vehicle vehicle){
-        mongo.save(vehicle);
+    public Vehicle save(Vehicle vehicle){
+        return mongo.save(vehicle);
     }
 
     @Override
@@ -55,4 +55,6 @@ public class MongoDBVehicleRepository implements VehicleRepository {
             return null;
         });
     }
+
+    //implement saveAll method
 }
