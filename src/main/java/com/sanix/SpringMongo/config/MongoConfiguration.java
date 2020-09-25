@@ -1,12 +1,12 @@
 package com.sanix.SpringMongo.config;
 
-import com.mongodb.client.MongoClient;
 import com.sanix.SpringMongo.repository.VehicleRepository;
 import com.sanix.SpringMongo.service.MongoDBVehicleRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.net.UnknownHostException;
+import org.springframework.data.mongodb.core.MongoClientFactoryBean;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import com.mongodb.Mongo;
 
 @Configuration
 public class MongoConfiguration {
@@ -14,12 +14,17 @@ public class MongoConfiguration {
     public static final String DB_NAME="vehicledb";
 
     @Bean
-    public Mongo mongo() throws UnknownHostException{
-        return new MongoClient();
+    public MongoTemplate mongo(Mongo mongo) throws Exception{
+        return new MongoTemplate(mongo, DB_NAME);
     }
 
     @Bean
-    public VehicleRepository vehicleRepository(Mongo mongo){
-        return new MongoDBVehicleRepository(mongo, DB_NAME, " vehicles");
+    public MongoClientFactoryBean mongoClientFactoryBean(){
+        return new MongoClientFactoryBean();
+    }
+
+    @Bean
+    public VehicleRepository vehicleRepository(MongoTemplate mongo){
+        return new MongoDBVehicleRepository(mongo, "vehicles");
     }
 }

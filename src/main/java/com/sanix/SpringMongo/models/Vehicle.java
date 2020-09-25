@@ -2,6 +2,8 @@ package com.sanix.SpringMongo.models;
 
 public class Vehicle {
 
+    private String id;
+
     private String vehicleNo;
     private String color;
     private int wheel;
