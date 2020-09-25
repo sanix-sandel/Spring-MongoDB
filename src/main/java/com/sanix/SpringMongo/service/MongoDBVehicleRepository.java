@@ -5,14 +5,15 @@ import com.mongodb.DBObject;
 import com.sanix.SpringMongo.models.Vehicle;
 import com.sanix.SpringMongo.repository.VehicleRepository;
 
+import javax.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MongoDBVehicleRepository implements VehicleRepository {
 
-    private final Mongo mongo;
-    private final String collectionName;
-    private final String databaseName;
+    private final Mongo mongo;//MongoDB client
+    private final String collectionName;//the name of the collection
+    private final String databaseName;//the name of the database
 
     public MongoDBVehicleRepository(Mongo mongo,
                                     String collectionName,
@@ -23,15 +24,19 @@ public class MongoDBVehicleRepository implements VehicleRepository {
     }
 
     @Override
-    public long Count(){
+    public long count(){
         return getCollection().count();
+
     }
 
     @Override
     public void save(Vehicle vehicle){
         BasicDBObject query=new BasicDBObject("vehicleNo", vehicle.getVehicleNo());
+        //To store objects, start by transforming the domain object Vehicle into
+        //a DBObject in this case(BasicDBObject)
         DBObject dbVehicle=transform(vehicle);
         DBObject fromDB =getCollection().findAndModify(query, dbVehicle);
+        //try first to update, if failed create a new vehicle
         if(fromDB==null){
             getCollection().insert(dbVehicle);
         }
@@ -62,6 +67,8 @@ public class MongoDBVehicleRepository implements VehicleRepository {
 
     private DBCollection getCollection(){
         return mongo.getDB(databaseName).getCollection(collectionName);
+        //the method gets a connection to the database and
+        //returns the configured DBCollection
     }
 
     private Vehicle transform(DBObject dbVehicle){
@@ -79,5 +86,10 @@ public class MongoDBVehicleRepository implements VehicleRepository {
             .append("wheel", vehicle.getWheel())
             .append("seat", vehicle.getSeat());
         return dbVehicle;
+    }
+
+    @PreDestroy
+    public void cleanUp(){
+        mongo.dropDatabase(databaseName);
     }
 }
